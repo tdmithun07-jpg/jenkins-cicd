@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: sample-app-1
-        image: 888154844094.dkr.ecr.us-east-1.amazonaws.com/jenkins-1201:latest
+        image: 888154844094.dkr.ecr.us-east-1.amazonaws.com/jenkins-2801:latest
         ports:
         - containerPort: 80
 ---
