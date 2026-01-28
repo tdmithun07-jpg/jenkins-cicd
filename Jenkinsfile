@@ -12,7 +12,7 @@ pipeline {
         stage('Checkout Code') {
             steps {
                 git branch: 'main',
-                    url: 'https://github.com/YOUR_USERNAME/YOUR_REPO.git'
+                    url: 'https://github.com/tdmithun07-jpg/jenkins-cicd.git'
             }
         }
 
