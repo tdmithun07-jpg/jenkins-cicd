@@ -3,27 +3,26 @@ pipeline {
 
     environment {
         AWS_REGION = "us-east-1"
-        ECR_REPO = "888154844094.dkr.ecr.us-east-1.amazonaws.com/jenkins-2801"
+        ECR_REPO = "888154844094.dkr.ecr.us-east-1.amazonaws.com/jenkins-1201"
         IMAGE_TAG = "latest"
     }
 
     stages {
-
-        stage('Checkout Code') {
+        stage('Checkout') {
             steps {
-                git branch: 'main',
-                    url: 'https://github.com/tdmithun07-jpg/jenkins-cicd.git'
+                git branch: 'main', url: 'https://github.com/tdmithun07-jpg/demo-jenkins-cicd.git'
             }
         }
 
         stage('Build Docker Image') {
             steps {
                 script {
-                    docker.build("${DOCKER_IMAGE}:${DOCKER_TAG}")
+                    docker.build("${ECR_REPO}:${IMAGE_TAG}")
                 }
             }
         }
-  stage('Login to ECR') {
+
+        stage('Login to ECR') {
             steps {
                 script {
                     sh '''
@@ -56,10 +55,10 @@ pipeline {
 
     post {
         success {
-            echo "✅ CI/CD Pipeline completed successfully!"
+            echo "🎉 Deployment successful! Check your LoadBalancer URL."
         }
         failure {
-            echo "❌ Pipeline failed"
+            echo "❌ Deployment failed."
         }
     }
 }
