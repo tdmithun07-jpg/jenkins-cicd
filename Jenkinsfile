@@ -2,8 +2,9 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = "DOCKERHUB_USERNAME/jenkins-demo"
-        DOCKER_TAG = "latest"
+        AWS_REGION = "us-east-1"
+        ECR_REPO = "888154844094.dkr.ecr.us-east-1.amazonaws.com/jenkins-2801"
+        IMAGE_TAG = "latest"
     }
 
     stages {
@@ -22,31 +23,33 @@ pipeline {
                 }
             }
         }
-
-        stage('Docker Login') {
+  stage('Login to ECR') {
             steps {
-                withCredentials([usernamePassword(
-                    credentialsId: 'dockerhub-creds',
-                    usernameVariable: 'DOCKER_USER',
-                    passwordVariable: 'DOCKER_PASS'
-                )]) {
-                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                script {
+                    sh '''
+                    aws ecr get-login-password --region $AWS_REGION | \
+                    docker login --username AWS --password-stdin $ECR_REPO
+                    '''
                 }
             }
         }
 
-        stage('Push Docker Image') {
+        stage('Push to ECR') {
             steps {
-                sh "docker push ${DOCKER_IMAGE}:${DOCKER_TAG}"
+                script {
+                    sh "docker push ${ECR_REPO}:${IMAGE_TAG}"
+                }
             }
         }
 
-        stage('Deploy to Kubernetes') {
+        stage('Deploy to EKS') {
             steps {
-                sh '''
-                kubectl apply -f k8s-deployment.yaml
-                kubectl apply -f k8s-service.yaml
-                '''
+                script {
+                    sh '''
+                    aws eks update-kubeconfig --name jenkins-cluster-1201 --region $AWS_REGION
+                    kubectl apply -f Deployment.yaml
+                    '''
+                }
             }
         }
     }
