@@ -1,11 +1,11 @@
-FROM node:18-alpine
+# Use the official Ubuntu base image
+FROM ubuntu:latest
 
-WORKDIR /app
+# Install NGINX
+RUN apt-get update -y && apt-get install -y nginx
 
-COPY package*.json ./
-RUN npm install
+# Copy application files to the default NGINX web root
+COPY ./app /var/www/html
 
-COPY . .
-
-EXPOSE 3000
-CMD ["npm", "start"]
+# Start NGINX in the foreground
+CMD ["nginx", "-g", "daemon off;"]
